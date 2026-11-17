@@ -267,5 +267,210 @@
       el.textContent = msg; el.classList.remove("hidden");
       clearTimeout(window._tt); window._tt = setTimeout(() => el.classList.add("hidden"), 2800);
     }
-    const openModal = id => document.getElementById(id).
-    
+    const openModal = id => document.getElementById(id).classList.remove("hidden");
+    const closeModal = id => document.getElementById(id).classList.add("hidden");
+    const toggleEl = id => document.getElementById(id).classList.toggle("hidden");
+
+    function render() {
+      const p = cur(), d = dom(p);
+      document.getElementById("sattvaPctText").textContent = p.s + "%";
+      document.getElementById("rajasPctText").textContent = p.r + "%";
+      document.getElementById("tamasPctText").textContent = p.t + "%";
+      document.getElementById("sRange").value = p.s; document.getElementById("svLabel").textContent = p.s + "%";
+      document.getElementById("rRange").value = p.r; document.getElementById("rvLabel").textContent = p.r + "%";
+      document.getElementById("tRange").value = p.t; document.getElementById("tvLabel").textContent = p.t + "%";
+
+      const badge = document.getElementById("dominantStateBadge");
+      badge.textContent = d === "sattva" ? "● Sattva Dominant · Clear" : d === "rajas" ? "● Rajas Dominant · Kinetic" : "● Tamas Dominant · Heavy";
+
+          badge.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-black/55 border border-white/10 " + (d === "sattva" ? "text-amber-300" : d === "rajas" ? "text-rose-300" : "text-indigo-300");
+
+      document.getElementById("profileStrip").innerHTML = state.profiles.map(pr => `
+        <button type="button" onclick="pickProf('${pr.id}')" class="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border ${pr.id===p.id ? 'bg-white/15 border-amber-400 text-white' : 'bg-white/5 border-white/10 text-slate-400'}">
+          <span>${pr.icon}</span><span>${pr.name}</span>
+        </button>`).join("") + `<button type="button" onclick="openModal('addModal')" class="shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold border border-dashed border-amber-400/50 text-amber-300">+ Add</button>`;
+
+      document.getElementById("microList").innerHTML = ACTIONS[d].map((txt, i) => {
+        const k = p.id + "_" + today() + "_" + i, ok = !!state.done[k];
+        return `<button type="button" onclick="doneAct('${k}')" class="w-full p-2.5 rounded-xl border text-left text-xs flex items-center gap-2 ${ok ? 'bg-emerald-500/15 border-emerald-400/40 line-through text-emerald-200' : 'bg-white/5 border-white/10 text-white'}"><span>${ok ? '✅' : '⭕'}</span><span>${txt}</span></button>`;
+      }).join("");
+
+      document.getElementById("trendTitle").textContent = p.name + "'s 7-Day Guna Rhythm";
+      const h = p.hist || [{d:"Today",s:p.s,r:p.r,t:p.t}];
+      document.getElementById("trendBars").innerHTML = h.map(x => `
+        <div class="flex flex-col items-center h-full justify-end">
+          <div class="w-6 h-20 rounded overflow-hidden flex flex-col-reverse bg-white/5">
+            <div style="height:${x.s}%" class="bg-amber-400"></div><div style="height:${x.r}%" class="bg-rose-500"></div><div style="height:${x.t}%" class="bg-indigo-500"></div>
+          </div>
+          <span class="text-[10px] text-slate-400 mt-1">${x.d}</span>
+        </div>`).join("");
+      document.getElementById("trendLogs").innerHTML = [...h].reverse().map(x => `<div class="flex justify-between p-2 rounded-lg bg-white/5 text-xs"><span>${x.d}</span><span class="font-semibold text-amber-300">S:${x.s}% · R:${x.r}% · T:${x.t}%</span></div>`).join("");
+
+      document.getElementById("circleList").innerHTML = state.profiles.map(pr => `
+        <div onclick="pickProf('${pr.id}')" class="p-2.5 rounded-xl bg-white/5 border border-white/10 flex justify-between items-center text-xs cursor-pointer">
+          <span class="font-bold">${pr.icon} ${pr.name}</span>
+          <span class="text-slate-300">S:${pr.s}% · R:${pr.r}% · T:${pr.t}%</span>
+        </div>`).join("");
+    }
+
+    function pickProf(id) { state.activeId = id; pulse = 0.8; save(); render(); }
+    function addPerson() {
+      const n = document.getElementById("newName").value.trim(); if (!n) return;
+      const np = { id: "p" + Date.now(), name: n, icon: "🌸", s: 46, r: 32, t: 22, hist: [{d:"Today",s:46,r:32,t:22}] };
+      state.profiles.push(np); state.activeId = np.id; save(); closeModal("addModal"); render(); toast("Switched to " + n);
+    }
+    function syncHist(p) {
+      if (!p.hist) p.hist = [];
+      const idx = p.hist.findIndex(x => x.d === "Today");
+      const entry = { d: "Today", s: p.s, r: p.r, t: p.t };
+      if (idx >= 0) p.hist[idx] = entry; else p.hist.push(entry);
+    }
+    function onSlide(k, v) {
+      v = parseInt(v, 10); const p = cur(), rem = 100 - v;
+      if (k === "s") { p.s = v; p.r = Math.max(5, Math.round(rem * 0.6)); p.t = 100 - p.s - p.r; }
+      else if (k === "r") { p.r = v; p.s = Math.max(5, Math.round(rem * 0.6)); p.t = 100 - p.s - p.r; }
+      else { p.t = v; p.s = Math.max(5, Math.round(rem * 0.6)); p.r = 100 - p.s - p.t; }
+      syncHist(p); save(); render();
+    }
+    function quickShift(m) {
+      const p = cur(), fb = document.getElementById("moodFeedback");
+      if (m === "calm") { p.s = Math.min(82, p.s + 10); p.r = Math.max(8, p.r - 8); p.t = 100 - p.s - p.r; fb.textContent = "Rajas cooled · +10% Sattva"; }
+      if (m === "focus") { p.s = Math.min(84, p.s + 8); p.t = Math.max(8, p.t - 8); p.r = 100 - p.s - p.t; fb.textContent = "Clarity sharpened"; }
+      if (m === "energize") { p.r = Math.min(60, p.r + 8); p.s = Math.min(75, p.s + 4); p.t = Math.max(8, 100 - p.s - p.r); fb.textContent = "Prana lifted · Fog cleared"; }
+      if (m === "unwind") { p.s = Math.min(78, p.s + 6); p.r = Math.max(8, p.r - 10); p.t = 100 - p.s - p.r; fb.textContent = "Nervous system softened"; }
+      pulse = 1; syncHist(p); save(); render();
+    }
+    function doneAct(k) {
+      if (!state.done[k]) {
+        state.done[k] = true; const p = cur(); p.s = Math.min(88, p.s + 4); p.r = Math.max(6, p.r - 4); p.t = 100 - p.s - p.r;
+        syncHist(p); pulse = 0.9; toast("+4% Sattva Aura Boost ✨"); save(); render();
+      }
+    }
+    function setTab(t) {
+      ["alchemist","trends","wisdom","circle"].forEach(x => {
+        document.getElementById("tp-" + x).classList.toggle("hidden", x !== t);
+        document.getElementById("tb-" + x).className = x === t ? "py-2 rounded-xl text-[11px] font-semibold bg-white/15 text-white" : "py-2 rounded-xl text-[11px] font-semibold text-slate-400";
+      });
+    }
+
+    let qi = 0, qa = [];
+    function openCheckIn() { qi = 0; qa = []; openModal("checkInModal"); showQ(); }
+    function showQ() {
+      const q = QS[qi];
+      document.getElementById("qStep").textContent = `Question ${qi + 1} of 7`;
+      document.getElementById("qTitle").textContent = q.t;
+      document.getElementById("qPrompt").textContent = q.p;
+      document.getElementById("qOpts").innerHTML = q.o.map((opt, idx) => `
+        <button type="button" onclick="pickQ(${idx})" class="w-full p-3 rounded-2xl bg-white/5 hover:bg-amber-400/20 border border-white/10 text-left text-xs font-bold text-white">${opt[0]}</button>`).join("");
+    }
+    function pickQ(idx) {
+      qa.push(QS[qi].o[idx][1]);
+      if (qi < 6) { qi++; showQ(); }
+      else {
+        let s = 2, r = 2, t = 2; qa.forEach(w => { s += w[0]; r += w[1]; t += w[2]; });
+        const tot = s + r + t, p = cur();
+        p.s = Math.round(s / tot * 100); p.r = Math.round(r / tot * 100); p.t = 100 - p.s - p.r;
+        syncHist(p); save(); closeModal("checkInModal"); pulse = 1.1; render();
+        toast(`${p.name}: S ${p.s}% · R ${p.r}% · T ${p.t}%`);
+      }
+    }
+
+    let bTimer = null, bSec = 60, bScale = 1;
+    function toggleBreath() {
+      if (bTimer) { clearInterval(bTimer); bTimer = null; bScale = 1; document.getElementById("breathBtn").textContent = "Start 60s"; document.getElementById("breathStatus").textContent = "Paused"; return; }
+      bSec = 60; document.getElementById("breathBtn").textContent = "Stop";
+      bTimer = setInterval(() => {
+        const ph = (60 - bSec) % 16, st = document.getElementById("breathStatus");
+        if (ph < 4) { st.textContent = `Inhale Slowly (${bSec}s)`; bScale = 1 + (ph / 4) * 0.2; }
+        else if (ph < 8) { st.textContent = `Hold Softly (${bSec}s)`; bScale = 1.2; }
+        else if (ph < 12) { st.textContent = `Exhale Slowly (${bSec}s)`; bScale = 1.2 - ((ph - 8) / 4) * 0.2; }
+        else { st.textContent = `Rest Empty (${bSec}s)`; bScale = 1; }
+        if (--bSec < 0) { clearInterval(bTimer); bTimer = null; bScale = 1; document.getElementById("breathBtn").textContent = "Start 60s"; st.textContent = "Complete · Sattva Elevated ✨"; quickShift("calm"); }
+      }, 1000);
+    }
+
+    let actx = null, sNode = null, sId = null;
+    function toggleSound(freq, id) {
+      if (sNode) { try { sNode.stop(); } catch(e) {} sNode = null; }
+      ["s1","s2","s3","s4"].forEach(x => document.getElementById(x).classList.remove("border-amber-400"));
+      if (sId === id) { sId = null; document.getElementById("audioBadge").textContent = "Off"; return; }
+      const C = window.AudioContext || window.webkitAudioContext; if (!C) return;
+      if (!actx) actx = new C(); if (actx.state === "suspended") actx.resume();
+      const g = actx.createGain(); g.gain.value = 0.05; g.connect(actx.destination);
+      if (freq === 0) {
+        const buf = actx.createBuffer(1, actx.sampleRate * 2, actx.sampleRate), d = buf.getChannelData(0);
+        for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * 0.3;
+        const n = actx.createBufferSource(); n.buffer = buf; n.loop = true;
+        const f = actx.createBiquadFilter(); f.type = "lowpass"; f.frequency.value = 320;
+        n.connect(f); f.connect(g); n.start(); sNode = n;
+      } else {
+        const o = actx.createOscillator(); o.frequency.value = freq; o.connect(g); o.start(); sNode = o;
+      }
+      sId = id; document.getElementById(id).classList.add("border-amber-400"); document.getElementById("audioBadge").textContent = "Playing";
+    }
+
+    function openShareModal() {
+      openModal("shareModal");
+      const c = document.getElementById("shareCanvas"), g = c.getContext("2d"), p = cur();
+      g.fillStyle = "#05070e"; g.fillRect(0, 0, 540, 960);
+      const rc = Math.round(2.51*p.s + 2.44*p.r + 0.99*p.t), gc = Math.round(1.91*p.s + 0.63*p.r + 1.02*p.t), bc = Math.round(0.36*p.s + 0.94*p.r + 2.41*p.t);
+      const gr = g.createRadialGradient(270, 430, 10, 270, 430, 220);
+      gr.addColorStop(0, "#fffbeb"); gr.addColorStop(0.5, `rgb(${rc},${gc},${bc})`); gr.addColorStop(1, "rgba(5,7,14,0)");
+      g.fillStyle = gr; g.beginPath(); g.ellipse(270, 430, 140, 195, 0, 0, Math.PI * 2); g.fill();
+      g.textAlign = "center"; g.fillStyle = "#fbbf24"; g.font = "bold 22px sans-serif"; g.fillText("PRANASPHERE · INNER WEATHER", 270, 100);
+      g.fillStyle = "#fff"; g.font = "bold 40px Georgia, serif"; g.fillText(p.name + "'s Mind Aura", 270, 155);
+      g.font = "bold 26px sans-serif"; g.fillText(`Sattva ${p.s}% · Rajas ${p.r}% · Tamas ${p.t}%`, 270, 720);
+      g.fillStyle = "#94a3b8"; g.font = "18px sans-serif"; g.fillText("pranasphere.netlify.app", 270, 890);
+    }
+    function saveCard() {
+      const a = document.createElement("a"); a.download = "PranaSphere-Aura.png";
+      a.href = document.getElementById("shareCanvas").toDataURL("image/png"); a.click(); toast("Saved PNG 📸");
+    }
+    function shareCard() {
+      document.getElementById("shareCanvas").toBlob(async b => {
+        const f = new File([b], "Aura.png", { type: "image/png" });
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [f] })) {
+          try { await navigator.share({ title: "My PranaSphere Aura", files: [f] }); return; } catch(e) {}
+        }
+        saveCard();
+      });
+    }
+
+    let pulse = 0;
+    const cv = document.getElementById("gunaCanvas"), cx2 = cv.getContext("2d");
+    const pts = Array.from({ length: 36 }, () => ({ a: Math.random() * 6.28, d: Math.random() * 110, sp: 0.3 + Math.random() * 0.5 }));
+    cv.addEventListener("pointerdown", () => { pulse = 1; });
+
+    function loop(ts) {
+      const w = 390, h = 285, mx = w / 2, my = h / 2 - 6, p = cur();
+      cx2.clearRect(0, 0, w, h);
+      const rc = Math.round(2.51*p.s + 2.44*p.r + 0.99*p.t), gc = Math.round(1.91*p.s + 0.63*p.r + 1.02*p.t), bc = Math.round(0.36*p.s + 0.94*p.r + 2.41*p.t);
+      const t = (ts || 0) * 0.001;
+      if (pulse > 0.01) pulse *= 0.93; else pulse = 0;
+      const sc = (bTimer ? bScale : 1 + Math.sin(t * (1.4 + p.r * 0.02)) * 0.03) + pulse * 0.08;
+      const rx = 74 * sc, ry = 104 * sc;
+
+      const aura = cx2.createRadialGradient(mx, my, 20, mx, my, ry + 45);
+      aura.addColorStop(0, `rgba(${rc},${gc},${bc},0.35)`); aura.addColorStop(1, `rgba(${rc},${gc},${bc},0)`);
+      cx2.fillStyle = aura; cx2.beginPath(); cx2.ellipse(mx, my, rx + 38, ry + 45, 0, 0, Math.PI * 2); cx2.fill();
+
+      pts.forEach(pt => {
+        pt.d += pt.sp; if (pt.d > 125) pt.d = 15;
+        cx2.fillStyle = `rgba(${rc},${gc},${bc},${(1 - pt.d / 125) * 0.7})`;
+        cx2.beginPath(); cx2.arc(mx + Math.cos(pt.a) * (rx * 0.6 + pt.d * 0.7), my + Math.sin(pt.a) * (ry * 0.6 + pt.d * 0.8), 2, 0, Math.PI * 2); cx2.fill();
+      });
+
+      const og = cx2.createRadialGradient(mx - 22, my - 32, 6, mx, my, ry * 1.05);
+      og.addColorStop(0, "rgba(255,253,244,0.96)"); og.addColorStop(0.4, `rgba(${rc},${gc},${bc},0.88)`); og.addColorStop(1, "rgba(15,23,42,0.92)");
+      cx2.fillStyle = og; cx2.beginPath(); cx2.ellipse(mx, my, rx, ry, 0, 0, Math.PI * 2); cx2.fill();
+      cx2.strokeStyle = "rgba(255,255,255,0.5)"; cx2.lineWidth = 1.5; cx2.stroke();
+
+      requestAnimationFrame(loop);
+    }
+
+    render();
+    requestAnimationFrame(loop);
+    if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+  </script>
+</body>
+</html>
