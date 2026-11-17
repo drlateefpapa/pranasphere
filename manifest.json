@@ -1,10 +1,10 @@
 {
-  "id": "/index.html",
+"id": "/pranasphere/",
   "name": "PranaSphere — Guna & Mind Energy",
   "short_name": "PranaSphere",
   "description": "Interactive 3D Guna energy visualizer, 7-point mental weather check-in, and mood alchemy toolkit.",
-  "start_url": "/index.html",
-  "scope": "/",
+  "start_url": "/pranasphere/index.html",
+  "scope": "/pranasphere/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#05070e",
