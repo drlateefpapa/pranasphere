@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#05070e" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="PranaSphere" />
+  <title>PranaSphere — Guna & Mind Energy</title>
+  <link rel="manifest" href="manifest.json" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-deep: #05070e;
+      --sattva-color: #fbbf24;
+      --rajas-color: #f43f5e;
+      --tamas-color: #6366f1;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-deep);
+      color: #f1f5f9;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    .font-serif-display {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .glass-panel {
+      background: rgba(15, 22, 40, 0.72);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .glass-card {
+      background: rgba(20, 29, 52, 0.62);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    @keyframes breathPulse {
+      0%, 100% { transform: scale(0.95); opacity: 0.55; }
+      50% { transform: scale(1.06); opacity: 0.92; }
+    }
+
+    .oval-fallback-aura {
+      width: 176px;
+      height: 238px;
+      border-radius: 50%;
+      background: radial-gradient(ellipse at 36% 28%, rgba(255, 251, 235, 0.92) 0%, rgba(251, 191, 36, 0.55) 45%, rgba(244, 63, 94, 0.25) 75%, rgba(99, 102, 241, 0.12) 100%);
+      box-shadow: 0 0 60px rgba(251, 191, 36, 0.35), inset 0 0 32px rgba(255, 255, 255, 0.45);
+      animation: breathPulse 5.5s ease-in-out infinite;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      outline: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #ffffff;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+    }
+
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-in {
+      animation: fadeSlideUp 0.28s ease-out forwards;
+    }
+  </style>
+</head>
+<body class="bg-[#05070e] text-slate-100 flex justify-center">
+
+  <div class="w-full max-w-[440px] min-h-screen flex flex-col relative pb-12 px-4 pt-3">
+
+    <!-- Top Header -->
+    <header class="flex items-center justify-between py-2">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-400 via-rose-500 to-indigo-500 p-[1.5px] shadow-lg shadow-amber-500/20">
+          <div class="w-full h-full rounded-full bg-[#070a14] flex items-center justify-center">
+            <span class="w-2.5 h-3.5 rounded-full bg-gradient-to-b from-amber-200 to-amber-500 block"></span>
+          </div>
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <h1 class="font-serif-display text-xl font-bold tracking-wide text-white leading-none">PranaSphere</h1>
+            <span id="streakBadge" class="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-400/25">🔥 1d</span>
+          </div>
+          <p class="text-[10px] uppercase tracking-[0.18em] text-slate-400 mt-0.5">Guna Energy &amp; Mind Weather</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-1.5">
+        <button onclick="openDisclaimerModal()" title="Wellness Disclaimer & App Info" class="w-8 h-8 rounded-full glass-panel flex items-center justify-center text-slate-300 hover:text-white border border-white/10 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </button>
+        <button onclick="openShareCardModal()" class="px-2.5 py-1.5 rounded-full bg-gradient-to-r from-amber-500/20 to-rose-500/20 border border-amber-400/35 text-[11px] font-semibold text-amber-200 flex items-center gap-1 hover:brightness-110 transition">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+          Share Aura
+        </button>
+      </div>
+    </header>
+
+    <!-- Pass-the-Phone Profile Switcher -->
+    <section class="mt-2">
+      <div class="flex items-center justify-between mb-1.5 px-0.5">
+        <span class="text-[11px] font-medium text-slate-400">Holding Phone Now:</span>
+        <span id="lastCheckedLabel" class="text-[10px] text-slate-500">Just now</span>
+      </div>
+      <div id="profileStrip" class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+
+    <!-- Rigid Central 3D Oval Mind Structure Stage -->
+    <section class="relative w-full h-[290px] my-2 rounded-3xl glass-panel overflow-hidden flex items-center justify-center select-none shadow-2xl">
+      <div id="stageAmbientGlow" class="absolute inset-0 pointer-events-none transition-all duration-700"
+           style="background: radial-gradient(circle at 50% 48%, rgba(251, 191, 36, 0.16), transparent 68%);"></div>
+
+      <div id="fallbackOval" class="oval-fallback-aura absolute pointer-events-none transition-all duration-500"></div>
+
+      <canvas id="gunaCanvas" width="390" height="290"
+              class="relative z-10 w-full h-[290px] block cursor-pointer"
+              title="Tap or hold oval to radiate calming Prana"></canvas>
+
+      <div class="absolute top-3 left-3 z-20 pointer-events-none">
+        <span id="dominantStateBadge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-black/45 backdrop-blur-md border border-white/10 text-amber-300">
+          <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+          Sattva Dominant · Clear
+        </span>
+      </div>
+
+      <div class="absolute top-3 right-3 z-20 pointer-events-none">
+        <span class="px-2 py-0.5 rounded-full text-[10px] text-slate-300/80 bg-black/35 backdrop-blur-sm border border-white/5">
+          Tap Oval
+        </span>
+      </div>
+
+      <div class="absolute bottom-2.5 inset-x-3 z-20 grid grid-cols-3 gap-1.5 pointer-events-none">
+        <div class="bg-black/50 backdrop-blur-md border border-amber-400/20 rounded-xl px-2.5 py-1.5 text-center">
+          <div class="text-[10px] uppercase tracking-wider text-amber-300/90 font-semibold">Sattva</div>
+          <div id="sattvaPctText" class="text-sm font-bold text-white">54%</div>
+        </div>
+        <div class="bg-black/50 backdrop-blur-md border border-rose-400/20 rounded-xl px-2.5 py-1.5 text-center">
+          <div class="text-[10px] uppercase tracking-wider text-rose-300/90 font-semibold">Rajas</div>
+          <div id="rajasPctText" class="text-sm font-bold text-white">28%</div>
+        </div>
+        <div class="bg-black/50 backdrop-blur-md border border-indigo-400/20 rounded-xl px-2.5 py-1.5 text-center">
+          <div class="text-[10px] uppercase tracking-wider text-indigo-300/90 font-semibold">Tamas</div>
+          <div id="tamasPctText" class="text-sm font-bold text-white">18%</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Primary Action Row -->
+    <div class="flex items-center gap-2 mt-1">
+      <button onclick="openCheckInModal()" class="flex-1 py-3 px-4 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 text-slate-950 font-bold text-sm shadow-lg shadow-amber-500/25 hover:brightness-105 active:scale-[0.99] transition flex items-center justify-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        7-Point Check-In (25s)
+      </button>
+      <button onclick="toggleManualSliders()" id="sliderToggleBtn" title="Fine-tune Guna Sliders" class="p-3 rounded-2xl glass-panel text-slate-200 hover:text-amber-300 border border-white/10 transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+      </button>
+    </div>
+
+    <!-- Collapsible Manual Fine-Tune Sliders -->
+    <div id="manualSlidersPanel" class="hidden mt-2.5 p-3.5 rounded-2xl glass-panel animate-in">
+      <div class="flex items-center justify-between mb-2.5">
+        <span class="text-xs font-semibold text-slate-200">Manual Guna Explorer</span>
+        <span class="text-[10px] text-slate-400">Auto-balances to 100%</span>
+      </div>
+      <div class="space-y-3">
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="text-amber-300 font-medium">Sattva (Clarity · Harmony)</span>
+            <span id="sliderSattvaVal" class="font-bold text-white">54%</span>
+          </div>
+          <input type="range" id="sliderSattva" min="5" max="90" value="54" oninput="handleManualSlider('sattva', this.value)" class="w-full accent-amber-400" />
+        </div>
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="text-rose-300 font-medium">Rajas (Drive · Restlessness)</span>
+            <span id="sliderRajasVal" class="font-bold text-white">28%</span>
+          </div>
+          <input type="range" id="sliderRajas" min="5" max="90" value="28" oninput="handleManualSlider('rajas', this.value)" class="w-full accent-rose-500" />
+        </div>
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="text-indigo-300 font-medium">Tamas (Stillness · Heaviness)</span>
+            <span id="sliderTamasVal" class="font-bold text-white">18%</span>
+          </div>
+          <input type="range" id="sliderTamas" min="5" max="90" value="18" oninput="handleManualSlider('tamas', this.value)" class="w-full accent-indigo-500" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Instant Mood Alchemist Quick-Shift Bar -->
+    <section class="mt-3 p-3 rounded-2xl glass-card">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-300">Instant Mood Shift</span>
+        <span id="moodShiftFeedback" class="text-[11px] text-amber-300 font-medium">Tap a state to shift aura</span>
+      </div>
+      <div class="grid grid-cols-4 gap-1.5">
+        <button onclick="applyQuickMoodShift('calm')" class="py-2 px-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-400/25 text-center transition">
+          <div class="text-base leading-none mb-1">🕊️</div>
+          <div class="text-[10px] font-semibold text-amber-200">Calm Mind</div>
+        </button>
+        <button onclick="applyQuickMoodShift('focus')" class="py-2 px-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-400/25 text-center transition">
+          <div class="text-base leading-none mb-1">🎯</div>
+          <div class="text-[10px] font-semibold text-emerald-200">Clear Focus</div>
+        </button>
+        <button onclick="applyQuickMoodShift('energize')" class="py-2 px-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-400/25 text-center transition">
+          <div class="text-base leading-none mb-1">⚡</div>
+          <div class="text-[10px] font-semibold text-rose-200">Lift Fog</div>
+        </button>
+        <button onclick="applyQuickMoodShift('unwind')" class="py-2 px-1.5 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-400/25 text-center transition">
+          <div class="text-base leading-none mb-1">🌙</div>
+          <div class="text-[10px] font-semibold text-indigo-200">Deep Rest</div>
+        </button>
+      </div>
+    </section>
+
+    <!-- Navigation Tabs -->
+    <nav class="grid grid-cols-4 gap-1 p-1 mt-3 rounded-2xl glass-panel">
+      <button onclick="switchTab('alchemist')" id="tabBtn-alchemist" class="py-2 px-1.5 rounded-xl text-[11px] font-semibold bg-white/15 text-white transition">
+        Alchemist
+      </button>
+      <button onclick="switchTab('trends')" id="tabBtn-trends" class="py-2 px-1.5 rounded-xl text-[11px] font-semibold text-slate-400 hover:text-white transition">
+        7d Trends
+      </button>
+      <button onclick="switchTab('wisdom')" id="tabBtn-wisdom" class="py-2 px-1.5 rounded-xl text-[11px] font-semibold text-slate-400 hover:text-white transition">
+        Ayurveda
+      </button>
+      <button onclick="switchTab('circle')" id="tabBtn-circle" class="py-2 px-1.5 rounded-xl text-[11px] font-semibold text-slate-400 hover:text-white transition">
+        Circle · Pro
+      </button>
+    </nav>
+
+    <!-- Tab Panels -->
+    <main class="mt-3 flex-1">
+
+      <!-- TAB 1: MOOD & GUNA ALCHEMIST -->
+      <div id="tabPanel-alchemist" class="space-y-3 animate-in">
+        <div class="p-4 rounded-2xl glass-panel">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <span id="breathProtocolTag" class="text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full bg-amber-400/15 text-amber-300">
+                Sama Vritti · 4-4-4-4 Balance
+              </span>
+              <h3 id="breathTitle" class="text-sm font-bold text-white mt-1.5">Harmonic Pranayama Pacer</h3>
+              <p id="breathSubtitle" class="text-xs text-slate-400 mt-0.5">Sync your breath with the glowing oval above to elevate Sattva.</p>
+            </div>
+            <button onclick="toggleBreathChime()" id="chimeToggleBtn" title="Toggle Gentle Bell Chimes" class="p-2 rounded-xl bg-white/5 border border-white/10 text-amber-300 text-xs">
+              🔔
+            </button>
+          </div>
+
+          <div class="mt-3 p-3 rounded-xl bg-black/35 border border-white/5 flex items-center justify-between">
+            <div>
+              <div id="breathPhaseLabel" class="text-sm font-bold text-amber-300">Ready to Begin</div>
+              <div id="breathTimerText" class="text-xs text-slate-400">60s guided visual + oval expansion</div>
+            </div>
+            <button onclick="toggleBreathSession()" id="breathActionBtn" class="px-4 py-2 rounded-xl bg-amber-400 text-slate-950 font-bold text-xs hover:brightness-105 transition">
+              Start 60s
+            </button>
+          </div>
+        </div>
+
+        <div class="p-4 rounded-2xl glass-panel">
+          <div class="flex items-center justify-between mb-2">
+            <div>
+              <h3 class="text-sm font-bold text-white">Therapeutic Frequency &amp; Nature Synth</h3>
+              <p class="text-[11px] text-slate-400">Offline Web Audio harmonics tuned to shift your Guna</p>
+            </div>
+            <span id="audioStatusBadge" class="text-[10px] px-2 py-0.5 rounded-full bg-white/5 text-slate-400">Off</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2 mt-2">
+            <button onclick="toggleSoundscape('sattva528')" id="snd-sattva528" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-left transition">
+              <div class="text-xs font-bold text-amber-300">✨ 528 Hz Sattva</div>
+              <div class="text-[10px] text-slate-400">Clarity &amp; Heart Coherence</div>
+            </button>
+            <button onclick="toggleSoundscape('calm432')" id="snd-calm432" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-left transition">
+              <div class="text-xs font-bold text-rose-300">🌊 432 Hz Cool Rajas</div>
+              <div class="text-[10px] text-slate-400">Slows racing thoughts</div>
+            </button>
+            <button onclick="toggleSoundscape('alpha10')" id="snd-alpha10" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-left transition">
+              <div class="text-xs font-bold text-indigo-300">⚡ Alpha Pulse</div>
+              <div class="text-[10px] text-slate-400">Clears Tamas fog</div>
+            </button>
+            <button onclick="toggleSoundscape('ocean')" id="snd-ocean" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-left transition">
+              <div class="text-xs font-bold text-cyan-300">🏝️ Island Surf</div>
+              <div class="text-[10px] text-slate-400">Gentle rhythmic waves</div>
+            </button>
+          </div>
+        </div>
+
+        <div class="p-4 rounded-2xl glass-panel">
+          <div class="flex items-center justify-between mb-2">
+            <h3 id="microActionHeader" class="text-sm font-bold text-white">2-Minute State Elevators</h3>
+            <span class="text-[10px] text-emerald-300 font-semibold">+Sattva Boost</span>
+          </div>
+          <div id="microActionsList" class="space-y-2">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <div class="p-4 rounded-2xl glass-panel border border-amber-400/20">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-[10px] uppercase tracking-widest text-amber-300 font-bold">Sankalpa · Mind Reframe</span>
+            <button onclick="cycleSankalpa()" class="text-[11px] text-slate-300 hover:text-white underline">Next Quote →</button>
+          </div>
+          <p id="sankalpaText" class="font-serif-display italic text-lg text-white leading-snug">
+            "I observe the waves of the mind without becoming the storm."
+          </p>
+        </div>
+      </div>
+
+      <!-- TAB 2: 7-DAY GUNA TREND HISTORY -->
+      <div id="tabPanel-trends" class="hidden space-y-3 animate-in">
+        <div class="p-4 rounded-2xl glass-panel">
+          <div class="flex items-center justify-between mb-1">
+            <div>
+              <h3 id="trendProfileTitle" class="text-sm font-bold text-white">7-Day Guna Energy Rhythm</h3>
+              <p class="text-[11px] text-slate-400">Daily balance snapshots saved on this device</p>
+            </div>
+            <button onclick="openShareCardModal()" class="text-[11px] font-semibold text-amber-300 hover:underline">
+              Export Card
+            </button>
+          </div>
+
+          <div id="trendChartContainer" class="mt-4 pt-2 pb-1 px-2 rounded-xl bg-black/35 border border-white/5">
+            <!-- Rendered dynamically -->
+          </div>
+
+          <div class="flex items-center justify-center gap-4 mt-3 text-[10px] text-slate-300">
+            <span class="flex items-center gap-1"><sp
